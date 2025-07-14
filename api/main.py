@@ -1,2 +1,2 @@
 # api/main.py
-from app.main import app  # reutiliza exatamente o objeto que você mostrou
+from app.main import app  # noqa: F401
