@@ -1,21 +1,32 @@
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from string import Template
 import os
 
-DATABASE_URL = os.getenv('DATABASE_URL')
+DB_USER = os.getenv('PG_USER')
+DB_PASSWORD = os.getenv('PG_PASSWORD')
+DB_NAME = os.getenv('DB_NAME')
+DB_PORT = os.getenv('DB_PORT')
+HOST = os.getenv('ENV')
 
-engine = create_engine(DATABASE_URL)
+DB_URL = Template('postgresql+psycopg2://$user:$password@$host:$port/$db_name')
+
+connString = DB_URL.safe_substitute(user=DB_USER, password=DB_PASSWORD, host=HOST, port=DB_PORT, db_name=DB_NAME)
+
+engine = create_engine(connString, echo=True)
+
 SessionLocal = sessionmaker(
   autocommit=False,
   autoflush=False,
   bind=engine,
 )
 
-Base = declarative_base()
+
+class Base(DeclarativeBase):
+  pass
 
 
-def get_db():
+def get_session():
   db = SessionLocal()
   try:
     yield db
@@ -23,5 +34,9 @@ def get_db():
     db.close()
 
 
-def create_tables():
-  Base.metadata.create_all(bind=engine)
+def setup_db():
+  with engine.connect() as conn:
+    conn.execute(text('CREATE SCHEMA IF NOT EXISTS main'))
+    conn.commit()
+
+  Base.metadata.create_all(engine)

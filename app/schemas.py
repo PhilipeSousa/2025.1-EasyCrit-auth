@@ -1,18 +1,42 @@
 from pydantic import BaseModel
+from app.models import UserRoles
 
 
-class UserSchema(BaseModel):
+class LoginSchema(BaseModel):
   username: str
-  email: str
   password: str
 
 
-class UserUpdateSchema(BaseModel):
+# User
+# Base for all other user schemas
+class UserBase(BaseModel):
+  username: str
+  email: str
+
+
+class UserPublic(UserBase):
+  id: int
+  role: UserRoles
+
+
+class UserCreate(UserBase):
+  password: str
+  role: UserRoles
+
+
+class UserUpdate(BaseModel):
   username: str | None = None
   email: str | None = None
+  password: str | None = None
 
 
 class UserList(BaseModel):
-  id: int
-  username: str
-  email: str
+  users: list[UserPublic]
+
+
+# TODO: Characters
+class CharacterBase(BaseModel):
+  name: str
+  biography: str
+  circle_color: str
+  user_id: str
