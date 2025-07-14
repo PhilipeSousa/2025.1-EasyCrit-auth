@@ -8,8 +8,8 @@ DB_PASSWORD = os.getenv('PASSWORD')
 DB_NAME = os.getenv('DB_NAME')
 DB_PORT = os.getenv('DB_PORT')
 HOST = os.getenv('ENV')
-if not HOST == 'production':
-  HOST = 'postgres'
+#if not HOST == 'production':
+  #HOST = 'postgres'
 
 DB_URL = Template('postgresql+psycopg2://$user:$password@$host:$port/$db_name')
 
